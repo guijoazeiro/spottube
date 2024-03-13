@@ -1,10 +1,12 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import axios from 'axios';
 import * as querystring from 'querystring';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { SpotifyTracksInterface } from '../../interfaces/spotify-tracks.interface';
+import { CreatePlaylistInterface } from 'src/http-connection/interfaces/spotify-createPlaylist.interface';
+import { AddTrackInterface } from 'src/http-connection/interfaces/spotify-addTrack.interface';
+import { SpotifyTokenInterface } from 'src/http-connection/interfaces/spotify-token.interface';
 @Injectable()
 export class SpotifyService {
   constructor(private readonly httpService: HttpService) {}
@@ -13,11 +15,9 @@ export class SpotifyService {
     redirect_uri: string,
     client_id: string,
     client_secret: string,
-  ): Promise<unknown> {
-    const response = await axios.post(
-      'https://accounts.spotify.com/api/token',
-      null,
-      {
+  ): Promise<SpotifyTokenInterface> {
+    const response: AxiosResponse<SpotifyTokenInterface> = await lastValueFrom(
+      this.httpService.post('https://accounts.spotify.com/api/token', null, {
         params: {
           code: code,
           redirect_uri: redirect_uri,
@@ -29,7 +29,7 @@ export class SpotifyService {
             'Basic ' +
             Buffer.from(client_id + ':' + client_secret).toString('base64'),
         },
-      },
+      }),
     );
     return response.data;
   }
@@ -69,9 +69,9 @@ export class SpotifyService {
     };
 
     try {
-      const response = await lastValueFrom(
-        this.httpService.post(url, data, { headers }),
-      );
+      const response: AxiosResponse<CreatePlaylistInterface> =
+        await lastValueFrom(this.httpService.post(url, data, { headers }));
+      console.log(response);
 
       return response.data.id;
     } catch (error) {
@@ -92,9 +92,10 @@ export class SpotifyService {
       uris: tracksUri,
     };
     try {
-      const response = await lastValueFrom(
+      const response: AxiosResponse<AddTrackInterface> = await lastValueFrom(
         this.httpService.post(url, data, { headers }),
       );
+      console.log(response);
       return response.data;
     } catch (error) {
       return error;
