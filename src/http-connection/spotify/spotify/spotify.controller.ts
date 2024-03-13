@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import {
   Controller,
   Get,
@@ -17,10 +16,7 @@ require('dotenv').config();
 
 @Controller('spotify')
 export class SpotifyController {
-  constructor(
-    private httpService: HttpService,
-    private spotifyService: SpotifyService,
-  ) {}
+  constructor(private spotifyService: SpotifyService) {}
 
   @Get('/login')
   async login(@Res() res: Response) {
@@ -48,7 +44,6 @@ export class SpotifyController {
     const client_secret = process.env.CLIENT_SECRET;
     const redirect_uri = process.env.REDIRECT_URI;
 
-    console.log(queryParams);
     const { code, state } = queryParams;
 
     if (state === null) {

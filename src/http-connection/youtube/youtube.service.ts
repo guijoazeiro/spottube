@@ -9,7 +9,7 @@ require('dotenv').config();
 export class YoutubeService {
   constructor(private httpService: HttpService) {}
 
-  async getPlaylistItems(playlistID: string) {
+  async getPlaylistItems(playlistID: string): Promise<string[]> {
     const titles = [];
     const url = `${process.env.YOUTUBE_URL}/playlistItems?part=snippet&playlistId=${playlistID}&maxResults=50&key=${process.env.YOUTUBE_API_KEY}`;
 

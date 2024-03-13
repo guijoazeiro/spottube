@@ -1,17 +1,46 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { YoutubeService } from 'src/http-connection/youtube/youtube.service';
 import { CreatePlaylistDTO } from './create-playlist.dto';
+import { SpotifyService } from 'src/http-connection/spotify/spotify/spotify.service';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
 @Controller('playlist')
 export class PlaylistController {
-  constructor(private readonly youtubeService: YoutubeService) {}
+  constructor(
+    private readonly youtubeService: YoutubeService,
+    private readonly spotifyService: SpotifyService,
+  ) {}
 
   @Post('create')
   async postPlaylist(@Body() createPlaylistDTO: CreatePlaylistDTO) {
+    const spotifyUriArray: string[] = [];
+    const { name, youtubeID } = createPlaylistDTO;
     try {
-      return await this.youtubeService.getPlaylistItems(
-        createPlaylistDTO.youtubeID,
+      const youtubeTracks =
+        await this.youtubeService.getPlaylistItems(youtubeID);
+
+      for (const track of youtubeTracks) {
+        const spotifyUri = await this.spotifyService.getTrackURI(
+          track,
+          process.env.SPOTIFY_TOKEN,
+        );
+        spotifyUriArray.push(spotifyUri);
+      }
+
+      const playlistID = await this.spotifyService.createPlaylist(
+        name,
+        process.env.SPOTIFY_USER_ID,
+        process.env.SPOTIFY_TOKEN,
       );
+
+      const responseplaylist = await this.spotifyService.addTracksToPlaylist(
+        spotifyUriArray,
+        playlistID,
+        process.env.SPOTIFY_TOKEN,
+      );
+
+      return responseplaylist;
     } catch (error) {
       return error;
     }
