@@ -3,8 +3,8 @@ Host: localhost:3000
 Content-Type: application/json
 
 {
-    "youtubeID": "RDCLAK5uy_kmq8ZD0NbHbKkZZ6frtlEjd8khfeZrAd0",
-    "name": "Afrobeat"
+    "youtubeID": "PLNE1G08bYrUrCbv5jvUAewlaggdUC66Fs",
+    "name": "Hits atuais do hip-hop"
     
 }
 ###

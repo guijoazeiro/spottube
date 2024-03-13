@@ -14,19 +14,20 @@ export class PlaylistController {
 
   @Post('create')
   async postPlaylist(@Body() createPlaylistDTO: CreatePlaylistDTO) {
-    const spotifyUriArray: string[] = [];
     const { name, youtubeID } = createPlaylistDTO;
     try {
       const youtubeTracks =
         await this.youtubeService.getPlaylistItems(youtubeID);
 
-      for (const track of youtubeTracks) {
-        const spotifyUri = await this.spotifyService.getTrackURI(
-          track,
-          process.env.SPOTIFY_TOKEN,
-        );
-        spotifyUriArray.push(spotifyUri);
-      }
+      const spotifyUriArray = await Promise.all(
+        youtubeTracks.map(async (track) => {
+          const spotifyUri = await this.spotifyService.getTrackURI(
+            track,
+            process.env.SPOTIFY_TOKEN,
+          );
+          return spotifyUri;
+        }),
+      );
 
       const playlistID = await this.spotifyService.createPlaylist(
         name,
