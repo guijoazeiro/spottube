@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  Req,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -39,7 +40,7 @@ export class SpotifyController {
   }
 
   @Get('/callback')
-  async callback(@Query() queryParams: any, @Res() res: Response) {
+  async callback(@Query() queryParams: any, @Req() req, @Res() res: Response) {
     const client_id = process.env.CLIENT_ID;
     const client_secret = process.env.CLIENT_SECRET;
     const redirect_uri = process.env.REDIRECT_URI;
@@ -57,6 +58,7 @@ export class SpotifyController {
         client_id,
         client_secret,
       );
+      req.session.user = 'teste';
       return res.json(tokenData);
     } catch (error) {
       throw new HttpException('Conflict', HttpStatus.CONFLICT);

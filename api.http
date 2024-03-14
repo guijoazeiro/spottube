@@ -8,3 +8,6 @@ Content-Type: application/json
     
 }
 ###
+
+
+GET http://localhost:3000/spotify/login
