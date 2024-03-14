@@ -71,7 +71,6 @@ export class SpotifyService {
     try {
       const response: AxiosResponse<CreatePlaylistInterface> =
         await lastValueFrom(this.httpService.post(url, data, { headers }));
-      console.log(response);
 
       return response.data.id;
     } catch (error) {
@@ -95,7 +94,6 @@ export class SpotifyService {
       const response: AxiosResponse<AddTrackInterface> = await lastValueFrom(
         this.httpService.post(url, data, { headers }),
       );
-      console.log(response);
       return response.data;
     } catch (error) {
       return error;
