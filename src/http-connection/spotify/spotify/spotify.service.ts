@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as querystring from 'querystring';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
@@ -16,22 +16,37 @@ export class SpotifyService {
     client_id: string,
     client_secret: string,
   ): Promise<SpotifyTokenInterface> {
-    const response: AxiosResponse<SpotifyTokenInterface> = await lastValueFrom(
-      this.httpService.post('https://accounts.spotify.com/api/token', null, {
-        params: {
-          code: code,
-          redirect_uri: redirect_uri,
-          grant_type: 'authorization_code',
-        },
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization:
-            'Basic ' +
-            Buffer.from(client_id + ':' + client_secret).toString('base64'),
-        },
-      }),
-    );
-    return response.data;
+    try {
+      const response: AxiosResponse<SpotifyTokenInterface> =
+        await lastValueFrom(
+          this.httpService.post(
+            'https://accounts.spotify.com/api/token',
+            null,
+            {
+              params: {
+                code: code,
+                redirect_uri: redirect_uri,
+                grant_type: 'authorization_code',
+              },
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Authorization:
+                  'Basic ' +
+                  Buffer.from(client_id + ':' + client_secret).toString(
+                    'base64',
+                  ),
+              },
+            },
+          ),
+        );
+      return response.data;
+    } catch (error) {
+      Logger.error(`Failed to get data ${error.message}`);
+      throw new HttpException(
+        'Failed to get Spotify token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getTrackURI(track: string, token: string) {
@@ -55,7 +70,11 @@ export class SpotifyService {
         return items[0].uri;
       }
     } catch (error) {
-      throw new HttpException('Conflict', HttpStatus.CONFLICT);
+      Logger.error(`Failed to get data ${error.message}`);
+      throw new HttpException(
+        'Failed to get Spotify token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -74,7 +93,11 @@ export class SpotifyService {
 
       return response.data.id;
     } catch (error) {
-      return error;
+      Logger.error(`Failed to get data ${error.message}`);
+      throw new HttpException(
+        'Failed to get Spotify token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -96,7 +119,11 @@ export class SpotifyService {
       );
       return response.data;
     } catch (error) {
-      return error;
+      Logger.error(`Failed to get data ${error.message}`);
+      throw new HttpException(
+        'Failed to get Spotify token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
