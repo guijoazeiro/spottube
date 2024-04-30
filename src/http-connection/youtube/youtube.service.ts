@@ -23,6 +23,7 @@ export class YoutubeService {
       });
       return titles;
     } catch (error) {
+      console.error(error);
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
   }

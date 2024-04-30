@@ -3,8 +3,8 @@ Host: localhost:3000
 Content-Type: application/json
 
 {
-    "youtubeID": "PLNE1G08bYrUrCbv5jvUAewlaggdUC66Fs",
-    "name": "Hits atuais do hip-hop"
+    "youtubeID": "RDCLAK5uy_mpx6f-Md6iPbWSaizatzQIHfcF33fmT7E",
+    "name": "Essential '90s Hip Hop"
     
 }
 ###
