@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { YoutubeTracksInterface } from '../interfaces/youtube-tracks-interface';
@@ -18,6 +18,7 @@ export class YoutubeService {
       const response: AxiosResponse<YoutubeTracksInterface> =
         await lastValueFrom(this.httpService.get(url));
       const items = response.data.items;
+      Logger.log(`Getting playlist ${playlistID} items`);
       const titles = items.map((item): string => {
         return item.snippet.title.replace(/\[.*?\]|\(.*?\)|<.*?>/g, '').trim();
       });

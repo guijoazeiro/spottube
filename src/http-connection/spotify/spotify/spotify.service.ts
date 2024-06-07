@@ -7,6 +7,7 @@ import { SpotifyTracksInterface } from '../../interfaces/spotify-tracks.interfac
 import { CreatePlaylistInterface } from 'src/http-connection/interfaces/spotify-createPlaylist.interface';
 import { AddTrackInterface } from 'src/http-connection/interfaces/spotify-addTrack.interface';
 import { SpotifyTokenInterface } from 'src/http-connection/interfaces/spotify-token.interface';
+import { SpotifyProfileInterface } from 'src/http-connection/interfaces/spotify-profile.interface';
 @Injectable()
 export class SpotifyService {
   constructor(private readonly httpService: HttpService) {}
@@ -95,6 +96,7 @@ export class SpotifyService {
     };
 
     try {
+      Logger.log(`Creating playlist`);
       const response: AxiosResponse<CreatePlaylistInterface> =
         await lastValueFrom(this.httpService.post(url, data, { headers }));
 
@@ -124,6 +126,7 @@ export class SpotifyService {
       uris: tracksUri,
     };
     try {
+      Logger.log(`Adding tracks to playlist`);
       const response: AxiosResponse<AddTrackInterface> = await lastValueFrom(
         this.httpService.post(url, data, { headers }),
       );
@@ -132,6 +135,25 @@ export class SpotifyService {
       Logger.error(`Failed to get data ${error.message}`);
       throw new HttpException(
         'Failed to get Spotify token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getProfile(token: string) {
+    const url = 'https://api.spotify.com/v1/me';
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    try {
+      const response: AxiosResponse<SpotifyProfileInterface> =
+        await lastValueFrom(this.httpService.get(url, { headers }));
+      return response.data.id;
+    } catch (error) {
+      Logger.error(`Failed to get data ${error}`);
+      throw new HttpException(
+        'Failed to get Spotify user data',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
