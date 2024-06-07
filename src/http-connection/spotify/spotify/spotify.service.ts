@@ -78,7 +78,14 @@ export class SpotifyService {
     }
   }
 
-  async createPlaylist(name: string, user_id: string, token: string) {
+  async createPlaylist(
+    name: string,
+    user_id: string,
+    token: string,
+  ): Promise<{
+    playlistId: string;
+    playlistUrl: string;
+  }> {
     const url = `https://api.spotify.com/v1/users/${user_id}/playlists`;
     const headers = {
       Authorization: `Bearer ${token}`,
@@ -91,7 +98,10 @@ export class SpotifyService {
       const response: AxiosResponse<CreatePlaylistInterface> =
         await lastValueFrom(this.httpService.post(url, data, { headers }));
 
-      return response.data.id;
+      return {
+        playlistId: response.data.id,
+        playlistUrl: response.data.external_urls.spotify,
+      };
     } catch (error) {
       Logger.error(`Failed to get data ${error.message}`);
       throw new HttpException(
