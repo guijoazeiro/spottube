@@ -17,7 +17,6 @@ export class PlaylistController {
     const { name, youtubeID, spotifyToken } = createPlaylistDTO;
     try {
       const profileId = await this.spotifyService.getProfile(spotifyToken);
-      console.log(profileId);
       const youtubeTracks =
         await this.youtubeService.getPlaylistItems(youtubeID);
 
