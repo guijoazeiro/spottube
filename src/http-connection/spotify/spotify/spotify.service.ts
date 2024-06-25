@@ -135,15 +135,15 @@ export class SpotifyService {
         return response.data;
       } else {
         const chunks = this.splitTracksArray(tracksUri);
-        let responsePlaylist;
-        for (const chunk of chunks) {
-          const response: AxiosResponse<AddTrackInterface> =
-            await lastValueFrom(
+        const promises = chunks.map(
+          (chunk): Promise<AxiosResponse<AddTrackInterface>> =>
+            lastValueFrom(
               this.httpService.post(url, { uris: chunk }, { headers }),
-            );
-          responsePlaylist = response.data;
-        }
-        return responsePlaylist;
+            ),
+        );
+
+        const responses = await Promise.all(promises);
+        return responses.map((response) => response.data);
       }
     } catch (error) {
       Logger.error(`Failed to get data ${error.message}`);
