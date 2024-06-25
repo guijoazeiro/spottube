@@ -2,6 +2,7 @@ export interface YoutubeTracksInterface {
   kind: string;
   etag: string;
   items: Item[];
+  nextPageToken?: string;
   pageInfo: PageInfo;
 }
 export interface PageInfo {
