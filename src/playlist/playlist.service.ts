@@ -12,10 +12,15 @@ export class PlaylistService {
 
   async createPlaylist(createPlaylistDTO: CreatePlaylistDTO) {
     const { name, youtubeID, spotifyToken } = createPlaylistDTO;
+
+    const youtubePlaylistID = youtubeID.includes('youtube.com')
+      ? youtubeID.split('list=')[1]
+      : youtubeID;
+
     try {
-      const profileId = await this.spotifyService.getProfile(spotifyToken);
       const youtubeTracks =
-        await this.youtubeService.getPlaylistItems(youtubeID);
+        await this.youtubeService.getPlaylistItems(youtubePlaylistID);
+      const profileId = await this.spotifyService.getProfile(spotifyToken);
 
       const spotifyUriArray = await Promise.all(
         youtubeTracks.map(async (track) => {
