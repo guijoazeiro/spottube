@@ -125,12 +125,26 @@ export class SpotifyService {
     const data = {
       uris: tracksUri,
     };
+
     try {
       Logger.log(`Adding tracks to playlist`);
-      const response: AxiosResponse<AddTrackInterface> = await lastValueFrom(
-        this.httpService.post(url, data, { headers }),
-      );
-      return response.data;
+      if (tracksUri.length <= 100) {
+        const response: AxiosResponse<AddTrackInterface> = await lastValueFrom(
+          this.httpService.post(url, data, { headers }),
+        );
+        return response.data;
+      } else {
+        const chunks = this.splitTracksArray(tracksUri);
+        let responsePlaylist;
+        for (const chunk of chunks) {
+          const response: AxiosResponse<AddTrackInterface> =
+            await lastValueFrom(
+              this.httpService.post(url, { uris: chunk }, { headers }),
+            );
+          responsePlaylist = response.data;
+        }
+        return responsePlaylist;
+      }
     } catch (error) {
       Logger.error(`Failed to get data ${error.message}`);
       throw new HttpException(
@@ -138,6 +152,14 @@ export class SpotifyService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  splitTracksArray(tracksArray: string[]) {
+    const chunks = [];
+    for (let i = 0; i < tracksArray.length; i += 100) {
+      chunks.push(tracksArray.slice(i, i + 100));
+    }
+    return chunks;
   }
 
   async getProfile(token: string) {
