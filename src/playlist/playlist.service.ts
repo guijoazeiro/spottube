@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { SpotifyService } from 'src/http-connection/spotify/spotify/spotify.service';
 import { YoutubeService } from 'src/http-connection/youtube/youtube.service';
 import { CreatePlaylistDTO } from './create-playlist.dto';
@@ -12,6 +12,11 @@ export class PlaylistService {
 
   async createPlaylist(createPlaylistDTO: CreatePlaylistDTO) {
     const { name, youtubeID, spotifyToken } = createPlaylistDTO;
+    if (!name || !youtubeID || !spotifyToken) {
+      throw new BadRequestException(
+        'Name, youtubeID and spotifyToken are required',
+      );
+    }
 
     const youtubePlaylistID = youtubeID.includes('youtube.com')
       ? youtubeID.split('list=')[1]
